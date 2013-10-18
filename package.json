@@ -1,0 +1,41 @@
+{
+  "name": "dwcareader",
+  "preferGlobal": false,
+  "version": "0.1.0",
+  "author": "SilverBiology <contact@silverbiology.com",
+  "description": "A library that reads Darwin Core Archives with loading functions for mongo, elastic search, and cartodb.",
+  "contributors": [ 
+    {
+      "name": "James Brown",
+      "email": "jabrown371@gmail.com"
+    } ,
+    {
+      "name": "Michael Giddens",
+      "email": "mikegiddens@silverbiology.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/silverbiology/dwcareader.git"
+  },
+  "keywords": [
+    "dwca",
+    "dwc",
+    "darwin core",
+    "gbif",
+    "idigbio"
+  ],
+  "dependencies" : {
+    "needle": "*",
+    "node-xml2json": "*",
+    "mime": "*",
+    "mongodb": "*",
+	"adm-zip": "*",
+	"csv": "*"
+  },
+  "analyze": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6"
+  }
+}
