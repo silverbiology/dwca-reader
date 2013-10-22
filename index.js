@@ -9,6 +9,8 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');  
 var url = require('url');
 var MongoClient = require('mongodb').MongoClient;
+var ElasticSearchClient = require('elasticsearchclient');
+var elastical = require('elastical');
 
 var dwcareader = function(config) {
   
@@ -56,14 +58,13 @@ var dwcareader = function(config) {
 	}
   
 	this.setArchive = function (location, callback) {
-		// Cover for errors
     try {
       if(location == "" || location == null) {
         callback(false, 101);
       }
       this.archive = location;
     } catch(err) {
-      // What to do with the error if it is caught?
+      console.log("Error:", err);    
     }
 	}
   
@@ -78,6 +79,7 @@ var dwcareader = function(config) {
 				}
 			});
       if(me.schema == null) {
+        console.log("the schema is null");
         callback(false, 102);
       }
 		}
@@ -99,6 +101,9 @@ var dwcareader = function(config) {
 				tmpData[tmpTerm] = term.default;
 			} else {
 				tmpData[tmpTerm] = data[term.index];
+        if(tmpData[tmpTerm] == '') {
+          tmpData[tmpTerm] = null;
+        }
 			}
 		});
 		tmpData = me.transform(tmpData);
@@ -108,7 +113,12 @@ var dwcareader = function(config) {
 	this.readData = function () {
 		var zip = new AdmZip(this.archive);
 		var list = zip.getEntries(); 
-		var occurenceFile = me.getSchema().archive.core.files.location;
+		var occurenceFile = me.getSchema(function(passed, err){
+        if(passed) {
+          console.log('Error:', err);
+          exit(1);
+        }
+      }).archive.core.files.location;
 		var firstFlag = true;
 		list.forEach(function(file) {
 			if(file.name == occurenceFile) {
@@ -130,9 +140,9 @@ var dwcareader = function(config) {
 		});
 	}
 
-function clone(a) {
-   return JSON.parse(JSON.stringify(a));
-}
+  function clone(a) {
+     return JSON.parse(JSON.stringify(a));
+  }
 	
 	this.import2mongo = function(options, callback) {
 		var time = new Date().getTime();
@@ -162,6 +172,48 @@ function clone(a) {
 			}
 		});
 	}
+  
+  function checkInDb(res) {
+    if(res.params != '') {
+      return true;
+    }
+  }
+  
+  this.import2elasticsearch = function(options, callback) {
+    var time = new Date().getTime();
+    var serverOptions = {
+      host : options.host,
+      port : options.port,
+      secure: options.secure
+    }
+    
+    var elasticSearchClient = new ElasticSearchClient(options);
+//    var client = new elastical.Client(options.host, {port: options.port});
+    console.log("Connected to Database:", options.host, options.port);
+    
+    me.on('record', function(data, index) {
+      var data = util._extend({}, data);
+      var indb = false;
+      elasticSearchClient.get(options.indexName, options.typeName,0,//options.id(data), 
+      function(err, res) {
+        if(!res.exists || res.exists == false) {
+          elasticSearchClient.index(options.indexName, options.typeName, data, options.id(data))
+        } else {
+          elasticSearchClient.update(options.indexName, options.typeName, options.id(data), data)
+        }
+      });
+    })
+    .on('csvEnd', function(count){
+      var res = {
+        count: count,
+        import_time: (new Date().getTime()-time)/1000 // in seconds
+      }
+      callback(false, res);
+    })
+    
+    me.readData(); // Start to read the data now that the listeners are ready.
+
+  }
   
   /*function extractArchive() {
     // Cover for errors in archive

@@ -30,8 +30,9 @@
     "node-xml2json": "*",
     "mime": "*",
     "mongodb": "*",
-	"adm-zip": "*",
-	"csv": "*"
+    "elasticsearchclient": "*",
+	  "adm-zip": "*",
+	  "csv": "*"
   },
   "analyze": false,
   "license": "MIT",
