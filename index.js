@@ -24,6 +24,8 @@ var dwcareader = function(config) {
 	}
 	this.archive = null;
 	this.schema = null;
+  // If there is a new path or file folder, set this to true, so that the new schema can be found
+  var newFile = false;
 
 	function getError(id) {
 		return {
@@ -33,6 +35,7 @@ var dwcareader = function(config) {
 	}
 
 	this.getArchive = function (url, destination, options, callback) {
+    newFile = true;
 		if (url == '' || url == null) {
 			callback(true, getError(100));
 		}
@@ -64,6 +67,7 @@ var dwcareader = function(config) {
 	}
   
 	this.setArchive = function (location, callback) {
+    newFile = true;
     try {
       if(location == "" || location == null) {
         callback(getError(101), null);
@@ -75,7 +79,8 @@ var dwcareader = function(config) {
 	}
   
 	this.getSchema = function (callback) {
-		if (me.schema == null) {
+		if (me.schema == null || newFile) {
+      newFile = false;
 			var zip = new AdmZip(this.archive);
 			var list = zip.getEntries();
 			list.forEach(function(file) {
@@ -86,7 +91,7 @@ var dwcareader = function(config) {
 			});
       if(me.schema == null) {
         console.log("the schema is null");
-        callback(false, getError(102));
+        callback(true, getError(102));
         process.exit(1);
       }
 		}
@@ -117,7 +122,7 @@ var dwcareader = function(config) {
 		return tmpData;
 	}
 
-	this.readData = function () {
+	function readData = function () {
     try {
 		var zip = new AdmZip(this.archive);
     } catch(err) {

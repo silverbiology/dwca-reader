@@ -7,6 +7,7 @@ To install the most recent version, you have to copy this version (no npm instal
 ## Introduction
 
 This is a Node.JS library to read Darwin Core Archives and load into MongoDB, ElasticSearch, or custom stream.
+The zip file must contain a meta.xml file, to give the information on the data to be read.
 The following is a simple example of downloading a file and uploading it into mongo.
 
 ```javascript
@@ -15,15 +16,13 @@ The following is a simple example of downloading a file and uploading it into mo
 
   // Download the following file, and send it to the next folder
   dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zip', 
-  "/Users/jamesbrown/Documents/Xentity/temp", 
+  "/Users/Documents/temp", 
   null, 
   function(error, response, body) {
     if(error) {
       console.log(error, response);
 	  }
   });
-
-  dr.setArchive("/Users/jamesbrown/Documents/Xentity/temp/test.zip", function(){});
 
   dr.transform = function(data) {
     /*
@@ -33,10 +32,10 @@ The following is a simple example of downloading a file and uploading it into mo
   }
 
   var config = {
-    host: "accounts.helpingscience.org",
-    port: "27017",
-    db: "james2",
-    table: "dwc2"
+    host: "host",
+    port: "1000",
+    db: "database",
+    table: "table"
   };
 
   dr.import2mongo(config, function(err, res) {
@@ -66,14 +65,15 @@ You can run the tests using
   $node testname
 
 The following are all of the tests at this point: 
-test1
+
+  * `test1
 
 ## Methods
 
 The following are all of the functions that can be used for this library.  All options are JSON objects with specific fields to be declared.
 
 
-## getArchive(url, destination, options, callback)
+### getArchive(url, destination, options, callback)
 
 This function takes the url and downloads the file.  It downloads it into the destination path, and creates a new file using the
 extension of the url. If a file with that name is already in the destination folder, the function assumes you do not want to download
@@ -83,4 +83,23 @@ The callback only takes an error and msg variables, eg:
   getArchive('facebook.com/junk', 'myUserName/Desktop', {}, function(error, message) {}
 ```
 
-## setArchive(location, callback)
+### setArchive(location, callback)
+
+This function takes a location of the files.  This is a simpler version of getArchive, and assumes the files are already downloaded.
+The callback is the same as above, takes an error and msg variables.
+
+### getSchema(callback)
+
+This function is inheritly called in the readData function, so it never needs to be called. It accesses the meta.xml file. 
+If the meta.xml is not found, it has a callback of the type function(err, msg).
+
+### import2mongo(options, callback)
+
+This function is used to send data from a url or file path into a specified mongo database.  The options variable must 
+have the following variables:
+
+  * `.host
+  * .port
+  * .db
+  * .table
+  
