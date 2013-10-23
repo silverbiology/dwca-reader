@@ -9,7 +9,7 @@ To install the most recent version, you have to copy this version (no npm instal
 This is a Node.JS library to read Darwin Core Archives and load into MongoDB, ElasticSearch, or custom stream.
 The following is a simple example of downloading a file and uploading it into mongo.
 
-'''javascript
+```javascript
   var dwcareader = require("../index.js");
   var dr = new dwcareader();
 
@@ -48,7 +48,7 @@ The following is a simple example of downloading a file and uploading it into mo
       console.log("It took a total of:", res.total_time, "seconds");
 	  }
   });
-'''
+```
 
 ## GitHub information
 
@@ -79,8 +79,8 @@ This function takes the url and downloads the file.  It downloads it into the de
 extension of the url. If a file with that name is already in the destination folder, the function assumes you do not want to download
 the url and will exit this function.  If you want to download the file anyways, set the options.overwrite = true.
 The callback only takes an error and msg variables, eg:
-'''javascript
+```javascript
   getArchive('facebook.com/junk', 'myUserName/Desktop', {}, function(error, message) {}
-'''
+```
 
 ## setArchive(location, callback)
