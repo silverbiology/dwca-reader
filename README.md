@@ -66,7 +66,7 @@ You can run the tests using
 
 The following are all of the tests at this point: 
 
-  * `test1
+  * test1
 
 ## Methods
 
@@ -98,8 +98,31 @@ If the meta.xml is not found, it has a callback of the type function(err, msg).
 This function is used to send data from a url or file path into a specified mongo database.  The options variable must 
 have the following variables:
 
-  * `.host
-  * .port
-  * .db
-  * .table
-  
+  * `.host`
+  * `.port`
+  * `.db`
+  * `.table`
+
+If any of the above variables are not defined, the function will callback with an error and a message, same as above.
+If the process completes, the callback gives out a (false, results), where the results has 3 fields:
+
+  * `.count` This is the number of records that were read in from the file (rows in a .csv file).
+  * `.read_time` This is the time it took to read the data from the file.
+  * `.total_time` This is the total amount of time it took to read and write the data.
+
+### import2elasticsearch(options, callback)
+
+This function is used to send data from a url or file path into a specified elasticsearch index.  The options variable must 
+have the following variables:
+
+  * `.host`
+  * `.port`
+  * `.db` This is the index value in elasticsearch
+  * `.table` This is the type name in elasticsearch
+
+If any of the above variables are not defined, the function will callback with an error and a message, same as above.
+If the process completes, the callback gives out a (false, results), where the results has 3 fields:
+
+  * `.count` This is the number of records that were read in from the file (rows in a .csv file).
+  * `.read_time` This is the time it took to read the data from the file.
+  * `.total_time` This is the total amount of time it took to read and write the data.

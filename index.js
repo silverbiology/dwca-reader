@@ -183,7 +183,7 @@ var dwcareader = function(config) {
           counter++;
 					// We need to make a clone of this since this data is changing I think too fast and causing references to break.
 					var data = util._extend({}, data);
-					collection.insert(data, {w:1}, function(err, objects) {});
+					collection.update(data, {w:1}, function(err, objects) {});
           if(counter >= ceiling && ceiling > 0) {
             results.total_time = (new Date().getTime() - startTime)/1000;
             db.close();
