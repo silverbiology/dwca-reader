@@ -10,15 +10,17 @@ var util = require('util');
 var url = require('url');
 var MongoClient = require('mongodb').MongoClient;
 var ElasticSearchClient = require('elasticsearchclient');
-var elastical = require('elastical');
 
 var dwcareader = function(config) {
   
 	var me = this;
 	var errors = {
-		100: "There was no url specified",
-		101: "There was no destination specified",
-		102: "No meta.xml file was found for the schema."
+		100: "There was no url specified.",
+		101: "There was no destination specified.",
+		102: "No meta.xml file was found for the schema.",
+    103: "No host was specified in the options parameter.",
+    104: "No port was specified in the options parameter.",
+    105: "The archive was not set for this dwcareader."
 	}
 	this.archive = null;
 	this.schema = null;
@@ -29,17 +31,13 @@ var dwcareader = function(config) {
 			msg: errors[id]
 		}
 	}
-  /*
-    This getArchive function works, but it is printing a ton of stuff
-    that I don't know what it is. Also, the .zip file is not being saved,
-    is it getting deleted?
-  */
+
 	this.getArchive = function (url, destination, options, callback) {
 		if (url == '' || url == null) {
-			callback(false, 100);
+			callback(getError(100), null);
 		}
 		if (destination == '' || destination == null || !fs.existsSync(destination)) {
-			callback(false, 101);
+			callback(getError(101), null);
 		}
 		var filename = clone(url);
 		//this removes the anchor at the end, if there is one
@@ -53,14 +51,19 @@ var dwcareader = function(config) {
 
 		// TODO try and get the filename or possibly from the header if it is a dynamic url like given in skype
 		var fullDestination = path.join(destination, filename);
-		this.archive = fullDestination;
-		needle.get(url, callback).pipe(fs.createWriteStream(fullDestination));
+    if(this.archive == fullDestination) {
+      var msg = "Download unnecessary, file already in destination";
+      callback(null, msg);
+    } else {
+  		this.archive = fullDestination;
+  		needle.get(url, callback).pipe(fs.createWriteStream(fullDestination));
+    }
 	}
   
 	this.setArchive = function (location, callback) {
     try {
       if(location == "" || location == null) {
-        callback(false, 101);
+        callback(getError(101), null);
       }
       this.archive = location;
     } catch(err) {
@@ -80,7 +83,8 @@ var dwcareader = function(config) {
 			});
       if(me.schema == null) {
         console.log("the schema is null");
-        callback(false, 102);
+        callback(false, getError(102));
+        process.exit(1);
       }
 		}
 		return me.schema;
@@ -111,12 +115,20 @@ var dwcareader = function(config) {
 	}
 
 	this.readData = function () {
+    try {
 		var zip = new AdmZip(this.archive);
-		var list = zip.getEntries(); 
+    } catch(err) {
+      console.log("This zip file is not correctly formated or is in the wrong place.");
+    }
+		var list = zip.getEntries();
+    if(this.archive == null) {
+      console.log(getError(105));
+      process.exit(1);
+    }
 		var occurenceFile = me.getSchema(function(passed, err){
-        if(passed) {
+        if(!passed) {
           console.log('Error:', err);
-          exit(1);
+          process.exit(1);
         }
       }).archive.core.files.location;
 		var firstFlag = true;
@@ -145,70 +157,97 @@ var dwcareader = function(config) {
   }
 	
 	this.import2mongo = function(options, callback) {
-		var time = new Date().getTime();
+		var counter = 0;
+    var ceiling = -1;
+    var startTime = new Date().getTime();
+    var results = {};
+    
 		var connectStr = 'mongodb://' + options.host + ':' + options.port + '/' + options.db;
 		MongoClient.connect(connectStr, function(err, db) {
 			if (err) {
 				callback(true, err);
+        process.exit(1);
 			} else {
 				var collection = db.collection(options.table);
 				console.log("Connected to Database:", options.host, options.port, options.db);
 				console.log("Connected to Table:", options.table);
 				me.on('record', function(data, index) {
+          counter++;
 					// We need to make a clone of this since this data is changing I think too fast and causing references to break.
 					var data = util._extend({}, data);
 					collection.insert(data, {w:1}, function(err, objects) {});
+          if(counter >= ceiling && ceiling > 0) {
+            results.total_time = (new Date().getTime() - startTime)/1000;
+            db.close();
+            callback(false, results);
+          }
 				})
 				.on('csvEnd', function(count) {
-					db.close();
-					var res = {
-						count: count,
-						import_time: (new Date().getTime() - time) / 1000 // in seconds
-					}
-					callback(false, res);
+          results.count = count;
+          results.read_time = (new Date().getTime() - startTime)/1000; // in seconds
+					ceiling = count-1;
+          if(counter == ceiling) {
+            results.total_time = (new Date().getTime() - startTime)/1000;
+            db.close();
+            callback(false, results);
+          }
+          
 				});
-
 				me.readData(); // Start to read the data now that the listeners are ready.
 			}
 		});
 	}
   
-  function checkInDb(res) {
-    if(res.params != '') {
-      return true;
-    }
-  }
-  
   this.import2elasticsearch = function(options, callback) {
-    var time = new Date().getTime();
-    var serverOptions = {
-      host : options.host,
-      port : options.port,
-      secure: options.secure
+    options.host = (options.host) ? options.host : '';
+    options.port = (options.port) ? options.port : '';
+
+    if(options.host == '') {
+      callback(true, getError(103));
+      process.exit(1);
     }
-    
-    var elasticSearchClient = new ElasticSearchClient(options);
-//    var client = new elastical.Client(options.host, {port: options.port});
-    console.log("Connected to Database:", options.host, options.port);
+    if(options.port == '') {
+      callback(true, getError(104));
+      process.exit(1);
+    }
+    var counter = 0;
+    var ceiling = -1;
+    var startTime = new Date().getTime();
+    try{
+      var elasticSearchClient = new ElasticSearchClient(options);
+      console.log("Connected to Database:", options.host, options.port);
+    } catch(err) {
+      console.log(err);
+    }
+    var results = {};
     
     me.on('record', function(data, index) {
       var data = util._extend({}, data);
-      var indb = false;
-      elasticSearchClient.get(options.indexName, options.typeName,0,//options.id(data), 
+      var upsertOptions = {"upsert" : {"counter" : 1}};
+      data = {
+        "doc" : data,
+        upsert : data
+      }
+      elasticSearchClient.update(options.db, options.table, options.id(data.doc), data,
       function(err, res) {
-        if(!res.exists || res.exists == false) {
-          elasticSearchClient.index(options.indexName, options.typeName, data, options.id(data))
-        } else {
-          elasticSearchClient.update(options.indexName, options.typeName, options.id(data), data)
+        counter++;
+        if(counter >= ceiling && ceiling > 0) {
+          results.total_time = (new Date().getTime() - startTime)/1000;
+          callback(false, results);
         }
       });
     })
     .on('csvEnd', function(count){
-      var res = {
-        count: count,
-        import_time: (new Date().getTime()-time)/1000 // in seconds
+      ceiling = count-1;
+      results.count = count;
+      results.read_time = (new Date().getTime() - startTime)/1000; // in seconds
+      if(counter == ceiling) {
+        results.total_time = (new Date().getTime() - startTime)/1000;
+        db.close();
+        callback(false, results);
       }
-      callback(false, res);
+      //callback(false, res);
+
     })
     
     me.readData(); // Start to read the data now that the listeners are ready.
