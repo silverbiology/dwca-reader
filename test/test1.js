@@ -6,7 +6,7 @@ var dr2 = new dwcareader();
 dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zip', 
 "/Users/jamesbrown/Documents/Xentity/temp", 
 null, 
-function(error, response, body) {
+function(error, msg) {
 	if(error) {
     console.log(error, response);
 	} else {

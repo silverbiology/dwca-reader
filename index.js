@@ -34,10 +34,10 @@ var dwcareader = function(config) {
 
 	this.getArchive = function (url, destination, options, callback) {
 		if (url == '' || url == null) {
-			callback(getError(100), null);
+			callback(true, getError(100));
 		}
 		if (destination == '' || destination == null || !fs.existsSync(destination)) {
-			callback(getError(101), null);
+			callback(true, getError(101));
 		}
 		var filename = clone(url);
 		//this removes the anchor at the end, if there is one
@@ -51,12 +51,15 @@ var dwcareader = function(config) {
 
 		// TODO try and get the filename or possibly from the header if it is a dynamic url like given in skype
 		var fullDestination = path.join(destination, filename);
-    if(this.archive == fullDestination) {
-      var msg = "Download unnecessary, file already in destination";
-      callback(null, msg);
+    if(this.archive == fullDestination && options.overwrite != true) {
+      callback(true, "Warning: file already in system and options.overwrite not set to true, so file was not downloaded.");
     } else {
   		this.archive = fullDestination;
-  		needle.get(url, callback).pipe(fs.createWriteStream(fullDestination));
+      try {
+  		  needle.get(url, callback).pipe(fs.createWriteStream(fullDestination));
+      } catch(err) {
+        callback(true, err);
+      }
     }
 	}
   
@@ -253,19 +256,6 @@ var dwcareader = function(config) {
     me.readData(); // Start to read the data now that the listeners are ready.
 
   }
-  
-  /*function extractArchive() {
-    // Cover for errors in archive
-    var extensionType = mime.extension(this.archive);
-    switch(extensionType) {
-      case "application/zip":
-        
-        break;
-      case "application/x-tar":
-        
-        break;
-    }
-  } */
 };
 
 util.inherits(dwcareader, EventEmitter);
