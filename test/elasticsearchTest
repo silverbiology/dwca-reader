@@ -2,9 +2,9 @@ var dwcareader = require("../index.js");
 var dr = new dwcareader();
 
 // Don't forget to set the path!
-var path = "";
+var path = "{local_path_to_store_file}";
 
-dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zip', 
+dr.getArchive('http://{path_to_archive}/archive.zip', 
 path, 
 null, 
 function(error, msg) {
@@ -26,10 +26,10 @@ var options = {
 
 dr.import2elasticsearch(options, function(err, res) {
   if (err) {
-		console.log("There was an error.");
-	} else {
-		console.log("Total records read into the elasticsearch db:", res.count);
+    console.log("There was an error.");
+  } else {
+    console.log("Total records read into the elasticsearch db:", res.count);
     console.log("It took", res.read_time, "seconds to read the file(s).");
     console.log("It took a total of:", res.total_time, "seconds");
-	}
+  }
 });
