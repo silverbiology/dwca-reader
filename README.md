@@ -74,18 +74,18 @@ After cloning the repository, enter the repository and use
   
 The drivers should all install, and the library will be up and running.
 
-## Tests
+## Examples
 
-Inside the test folder, there are multiple tests to run to check that the code is working, and throwing errors correctly when not.
-All of the tests require a local pathname, which is not set (it can be different for pc or mac).  This pathname must be set
-in each test.
-You can run the tests using 
+Inside the example folder, there are multiple examples to run to check that the code is working, and throwing errors correctly when not.
+All of the examples require a local pathname, which is not set (it can be different for pc or mac).  This pathname must be set
+in each example.
+You can run the examples using 
 
 ```javascript
 	node testname
 ```
 
-The following are all of the tests at this point: 
+The following are all of the examples at this point: 
 
   * archiveTest
   * elasticsearchTest
@@ -103,7 +103,7 @@ extension of the url. If a file with that name is already in the destination fol
 the url and will exit this function.  If you want to download the file anyways, set the options.overwrite = true.
 The callback only takes an error and msg variables, eg:
 ```javascript
-  getArchive('facebook.com/junk', 'myUserName/Desktop', {}, function(error, message) {}
+  getArchive('http://{path_to_url}/{archive}.zip', 'localPath', {}, function(error, message) {}
 ```
 
 ### setArchive(location, callback)
@@ -114,7 +114,7 @@ The callback is the same as above, takes an error and msg variables.
 ### getSchema(callback)
 
 This function is inheritly called in the readData function, so it never needs to be called. It accesses the meta.xml file. 
-If the meta.xml is not found, it has a callback of the type function(err, msg).
+If the meta.xml is not found, it has a callback of the type function(err, schema).
 
 ### import2mongo(options, callback)
 
