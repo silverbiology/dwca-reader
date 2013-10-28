@@ -2,7 +2,6 @@ var fs = require('fs');
 var needle = require('needle');
 var xml2json = require("node-xml2json");
 var path = require('path');
-var mime = require('mime');
 var AdmZip = require('adm-zip');
 var csv = require('csv');
 var EventEmitter = require('events').EventEmitter;
