@@ -4,8 +4,8 @@ var dr = new dwcareader();
 var path = '';
 /*
   Must set a path that works for your local machine.  This is different for Windows and Mac!
-  var path = C:\\xampp\\dwca-no.zip;
-  var path = /Users/username/Documents/temp;
+  var path = C:\\tmp\\archive.zip;
+  var path = /Users/Documents/temp;
 */
 path = '/Users/Documents/temp';
 
