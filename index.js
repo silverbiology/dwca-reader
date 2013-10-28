@@ -70,12 +70,13 @@ var dwcareader = function(config) {
     newFile = true;
     try {
       if(location == "" || location == null) {
-        callback(getError(101), null);
+        callback(true, getError(101));
       }
       this.archive = location;
     } catch(err) {
-      console.log("Error:", err);    
+      callback(true, err);
     }
+    callback(false, '');
 	}
   
 	this.getSchema = function (callback) {
@@ -122,7 +123,7 @@ var dwcareader = function(config) {
 		return tmpData;
 	}
 
-	function readData = function () {
+	this.readData = function () {
     try {
 		var zip = new AdmZip(this.archive);
     } catch(err) {
@@ -165,6 +166,17 @@ var dwcareader = function(config) {
   }
 	
 	this.import2mongo = function(options, callback) {
+    options.host = (options.host) ? options.host : '';
+    options.port = (options.port) ? options.port : '';
+
+    if(options.host == '') {
+      callback(true, getError(103));
+      process.exit(1);
+    }
+    if(options.port == '') {
+      callback(true, getError(104));
+      process.exit(1);
+    }
 		var counter = 0;
     var ceiling = -1;
     var startTime = new Date().getTime();
@@ -183,7 +195,12 @@ var dwcareader = function(config) {
           counter++;
 					// We need to make a clone of this since this data is changing I think too fast and causing references to break.
 					var data = util._extend({}, data);
-					collection.update(data, {w:1}, function(err, objects) {});
+					collection.update({}, data, {upsert: true}, function(err, objects) {
+  				  if(err) {
+    			    console.log(err.message);
+              process.exit(1);
+  				  } 
+					});
           if(counter >= ceiling && ceiling > 0) {
             results.total_time = (new Date().getTime() - startTime)/1000;
             db.close();

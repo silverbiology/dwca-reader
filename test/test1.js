@@ -8,9 +8,8 @@ dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zi
 null, 
 function(error, msg) {
 	if(error) {
-    console.log(error, response);
-	} else {
-    console.log(response); 
+    console.log("Could not get file from internet.");
+    console.log(error, msg);
 	}
 });
 
@@ -31,7 +30,6 @@ dr.transform = function(data) {
 var options = {
   host: 'localhost',
   port: 9200,
-  // pathPrefix:'optional pathPrefix',
   secure: false,
   db: "test1",
   table: "records",
@@ -46,7 +44,7 @@ dr2.import2elasticsearch(options, function(err, res) {
   } else {
     console.log("Total records read into the elasticsearch db:", res.count);
     console.log("It took:", res.read_time, "seconds to read the file(s).");
-    console.log("It took a total of:", res.total_time);
+    console.log("It took a total of", res.total_time, "seconds");
   }
 });
 

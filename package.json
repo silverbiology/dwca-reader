@@ -3,7 +3,7 @@
   "preferGlobal": false,
   "version": "0.1.0",
   "author": "SilverBiology <contact@silverbiology.com",
-  "description": "A library that reads Darwin Core Archives with loading functions for mongo, elastic search, and cartodb.",
+  "description": "A library that reads Darwin Core Archives with loading functions for mongo and elastic search.",
   "contributors": [ 
     {
       "name": "James Brown",
@@ -32,7 +32,9 @@
     "mongodb": "*",
     "elasticsearchclient": "*",
 	  "adm-zip": "*",
-	  "csv": "*"
+	  "csv": "*",
+    "util": "*",
+    "url": "*"
   },
   "analyze": false,
   "license": "MIT",

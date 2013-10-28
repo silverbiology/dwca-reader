@@ -60,13 +60,17 @@ The drivers should all install, and the library will be up and running.
 ## Tests
 
 Inside the test folder, there are multiple tests to run to check that the code is working, and throwing errors correctly when not.
+All of the tests require a local pathname, which is not set (it can be different for pc or mac).  This pathname must be set
+in each test.
 You can run the tests using 
 
   $node testname
 
 The following are all of the tests at this point: 
 
-  * test1
+  * archiveTest
+  * elasticsearchTest
+  * mongoTest
 
 ## Methods
 
