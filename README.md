@@ -4,7 +4,9 @@
 
 To install the most recent version, run 
 
-`npm install dwca-reader`
+```javascript
+	npm install dwca-reader
+```
 
 ## Introduction
 
@@ -66,7 +68,9 @@ The following is a simple example of downloading a file and uploading it into mo
 
 After cloning the repository, enter the repository and use 
 
-  $npm install
+```javascript
+	npm install
+```
   
 The drivers should all install, and the library will be up and running.
 
@@ -77,7 +81,9 @@ All of the tests require a local pathname, which is not set (it can be different
 in each test.
 You can run the tests using 
 
-  $node testname
+```javascript
+	node testname
+```
 
 The following are all of the tests at this point: 
 
