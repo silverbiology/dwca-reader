@@ -29,13 +29,10 @@
   "dependencies" : {
     "needle": "*",
     "node-xml2json": "*",
-    "mime": "*",
     "mongodb": "*",
     "elasticsearchclient": "*",
     "adm-zip": "*",
-    "csv": "*",
-    "util": "*",
-    "url": "*"
+    "csv": "*"
   },
   "analyze": false,
   "license": "MIT",
