@@ -1,9 +1,12 @@
 var dwcareader = require("../index.js");
 var dr = new dwcareader();
-
+/*
+ var url = 'http://{archive}/{name}.zip'
+ var path = '/Users/username/Docs/temp';
+*/
 var path = "";
 
-dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zip', 
+dr.getArchive(url, 
 path, 
 null, 
 function(error, msg) {
