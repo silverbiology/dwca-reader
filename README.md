@@ -126,3 +126,5 @@ If the process completes, the callback gives out a (false, results), where the r
   * `.count` This is the number of records that were read in from the file (rows in a .csv file).
   * `.read_time` This is the time it took to read the data from the file.
   * `.total_time` This is the total amount of time it took to read and write the data.
+
+
