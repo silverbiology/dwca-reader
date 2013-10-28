@@ -7,21 +7,21 @@ var path = '';
   var path = C:\\xampp\\dwca-no.zip;
   var path = /Users/username/Documents/temp;
 */
-path = '/Users/jamesbrown/Documents/Xentity/temp';
+path = '/Users/Documents/temp';
 
-dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zip', 
+dr.getArchive('http://{path_to_archive}/{name}.zip', 
 path, 
 null, 
 function(error, msg) {
-  if(error) {
+  if (error) {
     console.log(msg);
-	} else {
+  } else {
     console.log('getArchive worked!'); 
-	}
+  }
 });
 
-dr.setArchive(path+'test.zip', function(error, msg){
-  if(error) {
+dr.setArchive(path + 'archive.zip', function(error, msg){
+  if (error) {
     console.log(msg);
   } else {
     console.log('setArchive worked!');
