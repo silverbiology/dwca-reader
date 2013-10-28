@@ -8,12 +8,12 @@ path,
 null, 
 function(error, msg) {
   if(error) {
-    console.log(error, msg);
+    console.log(msg);
 	}
 });
 
 var config = {
-  host: "host",
+  host: "localhost",
   port: "1000",
   db: "database",
   table: "table"
@@ -21,7 +21,7 @@ var config = {
 
 dr.import2mongo(config, function(err, res) {
   if (err) {
-		console.log("There was an error.");
+		console.log(res);
 	} else {
 		console.log("Total records read into the mongodb:", res.count);
     console.log("It took", res.read_time, "seconds to read the file(s).");

@@ -20,7 +20,9 @@ var dwcareader = function(config) {
 		102: "No meta.xml file was found for the schema.",
     103: "No host was specified in the options parameter.",
     104: "No port was specified in the options parameter.",
-    105: "The archive was not set for this dwcareader."
+    105: "The archive was not set for this dwcareader.",
+    106: "The database was not specified in the options parameter.",
+    107: "The table was not specified in the options parameter."
 	}
 	this.archive = null;
 	this.schema = null;
@@ -36,10 +38,13 @@ var dwcareader = function(config) {
 
 	this.getArchive = function (url, destination, options, callback) {
     newFile = true;
+    var isDestination = true;
 		if (url == '' || url == null) {
+      isDestinatin = false;
 			callback(true, getError(100));
 		}
 		if (destination == '' || destination == null || !fs.existsSync(destination)) {
+      isDestination = false;
 			callback(true, getError(101));
 		}
 		var filename = clone(url);
@@ -56,7 +61,7 @@ var dwcareader = function(config) {
 		var fullDestination = path.join(destination, filename);
     if(this.archive == fullDestination && options.overwrite != true) {
       callback(true, "Warning: file already in system and options.overwrite not set to true, so file was not downloaded.");
-    } else {
+    } else if(isDestination) {
   		this.archive = fullDestination;
       try {
   		  needle.get(url, callback).pipe(fs.createWriteStream(fullDestination));
@@ -71,8 +76,9 @@ var dwcareader = function(config) {
     try {
       if(location == "" || location == null) {
         callback(true, getError(101));
+      } else {
+        this.archive = location;
       }
-      this.archive = location;
     } catch(err) {
       callback(true, err);
     }
@@ -91,9 +97,7 @@ var dwcareader = function(config) {
 				}
 			});
       if(me.schema == null) {
-        console.log("the schema is null");
         callback(true, getError(102));
-        process.exit(1);
       }
 		}
 		return me.schema;
@@ -124,19 +128,21 @@ var dwcareader = function(config) {
 	}
 
 	this.readData = function () {
-    try {
-		var zip = new AdmZip(this.archive);
-    } catch(err) {
-      console.log("This zip file is not correctly formated or is in the wrong place.");
-    }
-		var list = zip.getEntries();
     if(this.archive == null) {
       console.log(getError(105));
       process.exit(1);
     }
-		var occurenceFile = me.getSchema(function(passed, err){
-        if(!passed) {
-          console.log('Error:', err);
+    try {
+		  var zip = new AdmZip(this.archive);
+    } catch(err) {
+      console.log("The zip file is in the wrong place, or the file is not a zip file");
+      console.log(err);
+    }
+		var list = zip.getEntries();
+    
+		var occurenceFile = me.getSchema(function(err, msg){
+        if(err) {
+          console.log(msg);
           process.exit(1);
         }
       }).archive.core.files.location;
@@ -168,6 +174,8 @@ var dwcareader = function(config) {
 	this.import2mongo = function(options, callback) {
     options.host = (options.host) ? options.host : '';
     options.port = (options.port) ? options.port : '';
+    options.db = (options.db) ? options.db : '';
+    options.table = (options.table) ? options.table : '';
 
     if(options.host == '') {
       callback(true, getError(103));
@@ -177,6 +185,15 @@ var dwcareader = function(config) {
       callback(true, getError(104));
       process.exit(1);
     }
+    if(options.db == '') {
+      callback(true, getError(106));
+      process.exit(1);
+    }
+    if(options.table == '') {
+      callback(true, getError(107));
+      process.exit(1);
+    }
+    
 		var counter = 0;
     var ceiling = -1;
     var startTime = new Date().getTime();
@@ -226,6 +243,8 @@ var dwcareader = function(config) {
   this.import2elasticsearch = function(options, callback) {
     options.host = (options.host) ? options.host : '';
     options.port = (options.port) ? options.port : '';
+    options.db = (options.db) ? options.db : '';
+    options.table = (options.table) ? options.table : '';
 
     if(options.host == '') {
       callback(true, getError(103));
@@ -235,6 +254,15 @@ var dwcareader = function(config) {
       callback(true, getError(104));
       process.exit(1);
     }
+    if(options.db == '') {
+      callback(true, getError(106));
+      process.exit(1);
+    }
+    if(options.table == '') {
+      callback(true, getError(107));
+      process.exit(1);
+    }
+    
     var counter = 0;
     var ceiling = -1;
     var startTime = new Date().getTime();

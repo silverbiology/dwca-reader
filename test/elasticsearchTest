@@ -9,7 +9,7 @@ path,
 null, 
 function(error, msg) {
   if(error) {
-    console.log(error, msg);
+    console.log(msg);
   }
 });
 
