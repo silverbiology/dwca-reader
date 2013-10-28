@@ -17,8 +17,8 @@ The following is a simple example of downloading a file and uploading it into mo
   var dr = new dwcareader();
 
   // Download the following file, and send it to the next folder
-  dr.getArchive('url', 
-  "path", 
+  dr.getArchive('http://{path_to_archive}/{name}.zip', 
+  'path', 
   null, 
   function(error, response, body) {
     if(error) {
