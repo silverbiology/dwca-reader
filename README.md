@@ -17,14 +17,25 @@ The following is a simple example of downloading a file and uploading it into mo
   var dr = new dwcareader();
 
   // Download the following file, and send it to the next folder
-  dr.getArchive('http://images.cyberfloralouisiana.com/archives/dwca-no/dwca-no.zip', 
-  "/Users/Documents/temp", 
+  dr.getArchive('url', 
+  "path", 
   null, 
   function(error, response, body) {
     if(error) {
       console.log(error, response);
 	  }
   });
+  
+  /*
+  Or, you can upload from an already downloaded .zip file
+  dr.setArchive(path+'test.zip', function(error, msg){
+    if(error) {
+      console.log(msg);
+    } else {
+      console.log('setArchive worked!');
+    }
+  });
+  */
 
   dr.transform = function(data) {
     /*
