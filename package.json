@@ -24,7 +24,8 @@
     "darwin core",
     "darwin core archive",
     "gbif",
-    "idigbio"
+    "idigbio",
+    "tdwg"
   ],
   "dependencies" : {
     "needle": "*",
