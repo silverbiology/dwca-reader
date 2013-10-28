@@ -1,8 +1,8 @@
 {
-  "name": "dwcareader",
+  "name": "dwca-reader",
   "preferGlobal": false,
-  "version": "0.1.0",
-  "author": "SilverBiology <contact@silverbiology.com",
+  "version": "1.0.0",
+  "author": "SilverBiology <contact@silverbiology.com>",
   "description": "A library that reads Darwin Core Archives with loading functions for mongo and elastic search.",
   "contributors": [ 
     {
@@ -16,12 +16,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/silverbiology/dwcareader.git"
+    "url": "https://github.com/silverbiology/dwca-reader.git"
   },
   "keywords": [
     "dwca",
     "dwc",
     "darwin core",
+    "darwin core archive",
     "gbif",
     "idigbio"
   ],
@@ -31,8 +32,8 @@
     "mime": "*",
     "mongodb": "*",
     "elasticsearchclient": "*",
-	  "adm-zip": "*",
-	  "csv": "*",
+    "adm-zip": "*",
+    "csv": "*",
     "util": "*",
     "url": "*"
   },
