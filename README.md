@@ -2,7 +2,9 @@
 ===========
 ## Install
 
-To install the most recent version, you have to copy this version (no npm install available yet).
+To install the most recent version, run 
+
+`npm install dwca-reader`
 
 ## Introduction
 
